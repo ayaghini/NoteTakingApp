@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Note</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Include your CSS here -->
+</head>
+<body>
+    <div class="note-detail-container">
+        <h1>Update Note</h1>
+        <% if (message) { %>
+            <div class="alert alert-danger">
+                <%= message %>
+            </div>
+        <% } %>
+        <form action="/notes/<%= note._id %>/update" method="POST">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" value="<%= note.title %>" required class="form-control" placeholder="Enter note title">
+            </div>
+            <div class="form-group">
+                <label for="content">Content:</label>
+                <textarea name="content" id="content" required class="form-control" placeholder="Enter note content"><%= note.content %></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Note</button>
+        </form>
+        <p><a href="/notes/notes">Back to Notes</a></p>
+    </div>
+</body>
+</html>
