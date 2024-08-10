@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { check, validationResult } = require("express-validator");
 
 const User = require('../models/User');
 const Note = require('../models/Note'); // Import the Note model
@@ -69,27 +70,38 @@ router.get("/register", (req, res) => {
  *               example: HTML page displaying the server error message
  */
 
-router.post('/register', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        if (!email || !password) {
-            return res.render('register', { message: 'Email and password are required' });
+router.post('/register',
+    [
+        check('email').isEmail().withMessage("Email is not valid"),
+        check('password').isLength({ min: 6 }).withMessage("Password must be at least 6 characters long")
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.render('register', { message: errors.array()[0].msg });
         }
 
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.render('register', { message: 'Email already exists' });
+        const { email, password } = req.body;
+        try {
+            if ( !email || !password) {
+                return res.render('register', { message: 'Username, email, and password are required' });
+            }
+
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.render('register', { message: 'Email already exists' });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = await User.create({  email, password: hashedPassword });
+
+            res.render('login', { message: 'Please login using your email and password' });
+        } catch (err) {
+            console.error('Error during user registration:', err.message);
+            res.render('register', { message: 'Could not register due to a server error.' });
         }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await User.create({ email, password: hashedPassword });
-
-        res.render('login', { message: 'Please login using your email and password' });
-    } catch (err) {
-        console.error('Error during user registration:', err.message);
-        res.render('register', { message: 'Could not register due to a server error.' });
     }
-});
+);
 
 /**
  * @swagger
@@ -424,7 +436,7 @@ router.post('/delete-user-profile', passport.authenticate('jwt', { session: fals
     try {
         // Find and delete all notes for the user
         await Note.deleteMany({ owner: req.user._id });
-        
+
         // Find and delete the user
         await User.findByIdAndDelete(req.user._id);
 
