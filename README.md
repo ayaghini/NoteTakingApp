@@ -22,39 +22,39 @@ A simple and secure web application that allows users to create, manage, and org
 
 1. **Clone the repository:**
 
-   \`\`\`bash
+   ```bash
    git clone https://github.com/yourusername/notetaking-app.git
    cd notetaking-app
-   \`\`\`
+   ```
 
 2. **Install dependencies:**
 
-   \`\`\`bash
+   ```bash
    npm install
-   \`\`\`
+   ```
 
 3. **Set up environment variables:**
 
    Create a `.env` file in the root directory and add the following environment variables:
 
-   \`\`\`
+   ```
    SECRET=your-secret-key
    MONGO_URI=mongodb://localhost:27017/note-taking-app
    EMAIL=your-email@example.com
    EMAIL_PASSWORD=your-email-password
-   \`\`\`
+   ```
 
 4. **Run the application:**
 
-   \`\`\`bash
+   ```bash
    npm start
-   \`\`\`
+   ```
 
    The app should now be running on `http://localhost:3000`.
 
 ### Folder Structure
 
-\`\`\`
+```
 notetaking-app/
 │
 ├── config/
@@ -77,7 +77,7 @@ notetaking-app/
 ├── README.md          # This file
 ├── .env               # Environment variables
 └── package.json       # Node.js dependencies and scripts
-\`\`\`
+```
 
 ### API Documentation
 
