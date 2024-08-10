@@ -3,6 +3,10 @@
 
 A simple and secure web application that allows users to create, manage, and organize their notes. The application supports user registration, authentication, and provides functionalities to archive notes, change user passwords, and more.
 
+This project was developed as part of a mid-term assignment for a DevOps course I'm taking through UBC External Studies. The development process heavily relied on ChatGPT as an assistant, including the creation of this README file. The course helped me learn how to ask the right questions and guide GPT toward achieving my goals.
+
+The app is currently missing a few features, such as the ability to switch between light and dark themes. Although this was initially implemented, it was later abandoned due to time constraints. Additional features that would enhance the app include the ability to log in using Google, Facebook, etc., and the option to share your notes.
+
 ## Features
 
 - **User Authentication:** Secure login and registration using JWT authentication.
