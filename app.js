@@ -1,4 +1,5 @@
 const express = require('express');
+const serveSwagger = require('./swagger');
 const passport = require('passport');
 const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
@@ -71,4 +72,9 @@ app.get('/', (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+serveSwagger(app);
+
+app.listen(3000, () => {
+    console.log("Server is running on http://localhost:3000");
+    console.log("API docs are available at http://localhost:3000/api-docs");
+});

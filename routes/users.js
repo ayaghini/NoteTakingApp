@@ -24,7 +24,51 @@ router.get("/register", (req, res) => {
     return res.render('register', { message: 'Please register using your email adress' });
 });
 
-// User registration
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: Register a new user
+ *     description: Register a new user with an email and password. The password will be hashed before storing in the database.
+ *     tags: 
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Registration successful, user prompted to login
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page prompting the user to log in
+ *       400:
+ *         description: Email and password are required or email already exists
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page displaying the error message
+ *       500:
+ *         description: Server error
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page displaying the server error message
+ */
+
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -47,7 +91,63 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// User login
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Log in a user
+ *     description: Log in a user with their email and password. On success, a JWT token is issued and stored in a cookie.
+ *     tags: 
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       302:
+ *         description: Login successful, redirect to notes page
+ *         headers:
+ *           Set-Cookie:
+ *             description: JWT token set in an HTTP-only cookie
+ *             schema:
+ *               type: string
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: Redirect to the notes page
+ *       400:
+ *         description: Email and password are required
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page displaying the error message
+ *       401:
+ *         description: Wrong password or user not found
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page displaying the error message
+ *       500:
+ *         description: Server error
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page displaying the server error message
+ */
+
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -96,7 +196,37 @@ router.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-// Profile route
+/**
+ * @swagger
+ * /users/profile:
+ *   get:
+ *     summary: Get the user profile
+ *     description: Retrieve the profile information of the authenticated user, including the count of their notes.
+ *     tags: 
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved user profile
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page displaying the user profile and note count
+ *       401:
+ *         description: Unauthorized, user not authenticated
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: Redirect to login page
+ *       500:
+ *         description: Server error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Server Error, Could not fetch profile.
+ */
 router.get('/profile', (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user) => {
         if (err || !user) {
@@ -106,7 +236,7 @@ router.get('/profile', (req, res, next) => {
         next();
     })(req, res, next);
 }, async (req, res) => {
-    console.log(req.path);
+    //console.log(req.path);
     try {
         const noteCount = await Note.countDocuments({ owner: req.user._id });
         res.render('profile', { user: req.user, noteCount, message: null, successMessage: null, currentPath: req.path });
@@ -116,7 +246,57 @@ router.get('/profile', (req, res, next) => {
     }
 });
 
-// Change Password route
+/**
+ * @swagger
+ * /users/change-password:
+ *   post:
+ *     summary: Change the user's password
+ *     description: Allows the authenticated user to change their password by providing the current password and a new password.
+ *     tags: 
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 example: currentPassword123
+ *               newPassword:
+ *                 type: string
+ *                 example: newPassword456
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page indicating the password was changed successfully
+ *       400:
+ *         description: Current password is incorrect
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page indicating the current password is incorrect
+ *       401:
+ *         description: Unauthorized, user not authenticated
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: Redirect to login page
+ *       500:
+ *         description: Server error
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page displaying a server error message
+ */
 router.post('/change-password', (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (err, user) => {
         if (err || !user) {
