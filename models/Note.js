@@ -14,6 +14,10 @@ const NoteSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User', // Reference to the User model
         required: true
+    },
+    archived: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true // Automatically adds createdAt and updatedAt fields

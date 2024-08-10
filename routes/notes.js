@@ -14,7 +14,7 @@ router.get('/', (req, res, next) => {
     })(req, res, next);
 }, async (req, res) => {
     try {
-        const notes = await Note.find({ owner: req.user._id });
+        const notes = await Note.find({ owner: req.user._id, archived: false });
         res.render('notes', { notes, currentPath: req.path });
     } catch (err) {
         console.error('Error fetching notes:', err.message);
@@ -139,6 +139,65 @@ router.post('/:id/update', passport.authenticate('jwt', { session: false }), asy
     } catch (err) {
         console.error('Error updating note:', err.message);
         res.status(500).json({ success: false, message: 'Could not update note.' });
+    }
+});
+
+// Archive a note
+router.post('/:id/archive', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+        const note = await Note.findOneAndUpdate(
+            { _id: req.params.id, owner: req.user._id },
+            { archived: true },
+            { new: true }
+        );
+        if (!note) {
+            return res.status(404).send('Note not found or you are not authorized to archive it.');
+        }
+        res.json({ success: true, message: 'Note Archived successfully' });
+    } catch (err) {
+        console.error('Error archiving note:', err.message);
+        res.status(500).send('Server Error: Could not archive note.');
+    }
+});
+
+// Unarchive a note
+router.post('/:id/unarchive', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+        const note = await Note.findOneAndUpdate(
+            { _id: req.params.id, owner: req.user._id },
+            { archived: false },
+            { new: true }
+        );
+        if (!note) {
+            return res.status(404).send('Note not found or you are not authorized to unarchive it.');
+        }
+        //res.redirect('/notes');
+        res.json({ success: true, message: 'Note UnArchived successfully' });
+
+    } catch (err) {
+        console.error('Error unarchiving note:', err.message);
+        res.status(500).send('Server Error: Could not unarchive note.');
+    }
+});
+
+// Get archived notes
+router.get('/archived', (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+        if (err || !user) {
+            return res.render('login', { message: null });
+        }
+        req.user = user;
+        next();
+    })(req, res, next);
+}, async (req, res) => {
+    try {
+        const notes = await Note.find({ owner: req.user._id, archived: true });
+        res.render('archived-notes', { notes, currentPath: req.path });
+        //res.json({ success: true, message: 'Note Archived successfully' });
+
+    } catch (err) {
+        console.error('Error fetching archived notes:', err.message);
+        res.status(500).send('Server Error: Could not fetch archived notes.');
     }
 });
 

@@ -14,16 +14,22 @@ function loadNoteContent(noteId) {
                         </div>
                         <div class="form-group">
                             <label for="content">Content</label>
-                            <textarea id="content" name="content" rows="10" required class="form-control">${data.content}</textarea>
+                            <div id="editor-container">${data.content}</div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Save</button>
                     </form>
                 `;
 
+                // Initialize Quill editor
+                const quill = new Quill('#editor-container', {
+                    theme: 'snow'
+                });
+
                 const form = document.getElementById('edit-note-form');
                 form.addEventListener('submit', function(event) {
                     event.preventDefault();
-                    updateNote(noteId);
+                    const content = quill.root.innerHTML;
+                    updateNote(noteId, content);
                 });
             })
             .catch(error => console.error('Error loading note content:', error));
@@ -37,25 +43,30 @@ function loadNoteContent(noteId) {
                 </div>
                 <div class="form-group">
                     <label for="content">Content</label>
-                    <textarea id="content" name="content" rows="10" required class="form-control"></textarea>
+                    <div id="editor-container"></div>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Save</button>
             </form>
         `;
 
+        // Initialize Quill editor
+        const quill = new Quill('#editor-container', {
+            theme: 'snow'
+        });
+
         const form = document.getElementById('edit-note-form');
         form.addEventListener('submit', function(event) {
             event.preventDefault();
-            updateNote();
+            const content = quill.root.innerHTML;
+            updateNote(null, content);
         });
     }
 }
 
-function updateNote(noteId) {
+function updateNote(noteId, content) {
     const form = document.getElementById('edit-note-form');
     const formData = new FormData(form);
     const title = formData.get('title');
-    const content = formData.get('content');
 
     const url = noteId ? `/notes/${noteId}/update` : '/notes/create';
     const method = noteId ? 'POST' : 'POST';
@@ -90,12 +101,54 @@ function deleteNote(noteId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Note deleted successfully');
+                //alert('Note deleted successfully');
                 location.reload();
             } else {
                 alert('Error deleting note: ' + data.message);
             }
         })
         .catch(error => console.error('Error deleting note:', error));
+    }
+}
+
+function archiveNote(noteId) {
+    if (true) {
+        fetch(`/notes/${noteId}/archive`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                //alert('Note archived successfully');
+                location.reload();
+            } else {
+                alert('Error archiving note: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error archiving note:', error));
+    }
+}
+
+function unarchiveNote(noteId) {
+    if (true) {
+        fetch(`/notes/${noteId}/unarchive`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                //alert('Note unarchived successfully');
+                location.reload();
+            } else {
+                alert('Error unarchiving note: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error unarchiving note:', error));
     }
 }
