@@ -525,7 +525,7 @@ router.post('/reset-password/:token', async (req, res) => {
 /**
  * @swagger
  * /users/delete-user-profile:
- *   post:
+ *   delete:
  *     summary: Delete user profile
  *     description: Allows the authenticated user to delete their profile and all associated notes. This action is irreversible.
  *     tags: 
@@ -546,7 +546,7 @@ router.post('/reset-password/:token', async (req, res) => {
  *           text/plain:
  *             schema:
  *               type: string
- *               example: Server Error, Could not delete profile.
+ *               example: Server Error Could not delete profile.
  */
 
 router.post('/delete-user-profile', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -566,5 +566,6 @@ router.post('/delete-user-profile', passport.authenticate('jwt', { session: fals
         res.status(500).send('Server Error: Could not delete profile.');
     }
 });
+
 
 module.exports = router;
