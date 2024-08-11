@@ -343,6 +343,48 @@ router.get('/forgot-password', (req, res) => {
     res.render('forgot-password', { message: null, successMessage: null });
 });
 
+/**
+ * @swagger
+ * /users/forgot-password:
+ *   post:
+ *     summary: Request a password reset
+ *     description: Allows a user to request a password reset by providing their email address. If the email exists in the system, a reset link is sent to the email.
+ *     tags: 
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: Password reset email sent
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: An e-mail has been sent to user@example.com with further instructions.
+ *       404:
+ *         description: Email not found
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: No account with that email address exists.
+ *       500:
+ *         description: Server error
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: Could not send reset email due to a server error.
+ */
+
 router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
 
@@ -395,6 +437,55 @@ router.get('/reset-password/:token', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /users/reset-password/{token}:
+ *   post:
+ *     summary: Reset the user's password
+ *     description: Allows a user to reset their password using a valid reset token. The token must not be expired.
+ *     tags: 
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The password reset token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: newPassword456
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: HTML page indicating the password has been changed
+ *       400:
+ *         description: Invalid or expired token
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: Password reset token is invalid or has expired.
+ *       500:
+ *         description: Server error
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: Could not reset password due to a server error.
+ */
+
 router.post('/reset-password/:token', async (req, res) => {
     const { password } = req.body;
 
@@ -431,7 +522,33 @@ router.post('/reset-password/:token', async (req, res) => {
     }
 });
 
-// Delete User Profile
+/**
+ * @swagger
+ * /users/delete-user-profile:
+ *   post:
+ *     summary: Delete user profile
+ *     description: Allows the authenticated user to delete their profile and all associated notes. This action is irreversible.
+ *     tags: 
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile and all associated notes have been deleted successfully
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ *               example: Your profile and all associated notes have been deleted.
+ *       500:
+ *         description: Server error
+ *         content:
+ *           text/plain:
+ *             schema:
+ *               type: string
+ *               example: Server Error, Could not delete profile.
+ */
+
 router.post('/delete-user-profile', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
         // Find and delete all notes for the user
